@@ -34,17 +34,24 @@ LIB=
 OBJ = $(patsubst %.cpp,%.o,$(SRC))
 OBJ += libs/kiss_fft130/kiss_fft.o # if you want to use KissFFT
 
+# find all the .cpp files and make a list of those, but with the .exe extension
+CPP = $(wildcard *.cpp)
+EXE = $(patsubst %.cpp,%.exe,$(CPP))
+
+# build all the .cpp into .exe
+_: $(EXE)
+
+%.exe: %.o libgist.a
+	$(CXX) $(INC) -o $@ $^
+
 %.o: %.cpp
 	$(CXX) $(INC) -c -o $@ $^
 
 %.o: %.c
 	$(CXX) $(INC) -c -o $@ $^
 
-use-gist: libgist
-	$(CXX) $(LIB) $(INC) use-gist.cpp libgist.a -o use-gist
-
-libgist: $(OBJ)
-	ar -rc libgist.a $^
+libgist.a: $(OBJ)
+	ar -rc $@ $^
 
 clean:
-	rm -f $(OBJ) libgist.a use-gist
+	rm -f $(OBJ) *.exe libgist.a
